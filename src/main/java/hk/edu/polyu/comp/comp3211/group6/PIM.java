@@ -28,7 +28,7 @@ public class PIM {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
         for (;;) {
-            System.out.print("(hk.edu.polyu.comp.comp3211.group6.PIM) ");
+            System.out.print("PIM> ");
             String line = reader.readLine();
             if (line == null) break;
             run(line);
