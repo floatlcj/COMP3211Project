@@ -50,35 +50,36 @@ public class Parser {
 
     private Token consume(TokenType type, String message){
         if(check(type)) return advance();
-        throw error(message);
+        throw new ParserError(message);
     }
 
     private Token consume(TokenType type1, TokenType type2, String message){
         if (check(type1)) return advance();
         else if (check(type2)) return advance();
-        throw error(message);
-    }
-
-    private PIMError error(String message){
-        return new PIMError(message);
+        throw new ParserError(message);
     }
 
     public Stmt parse(){
-        if (match(TokenType.CREATE)) return crateStmt();
-        if (match(TokenType.PRINT)) return printStmt();
-        if (match(TokenType.EXIT)) return exitStmt();
-        if (match(TokenType.SAVE)) return saveStmt();
-        if (match(TokenType.LOAD)) return loadStmt();
-        if (match(TokenType.MODIFY)) return modifyStmt();
-        if (match(TokenType.SEARCH)) return searchStmt();
-        if (match(TokenType.DELETE)) return deleteStmt();
-        throw error("""
+        try{
+            if (match(TokenType.CREATE)) return crateStmt();
+            if (match(TokenType.PRINT)) return printStmt();
+            if (match(TokenType.EXIT)) return exitStmt();
+            if (match(TokenType.SAVE)) return saveStmt();
+            if (match(TokenType.LOAD)) return loadStmt();
+            if (match(TokenType.MODIFY)) return modifyStmt();
+            if (match(TokenType.SEARCH)) return searchStmt();
+            if (match(TokenType.DELETE)) return deleteStmt();
+            throw new ParserError("""
                 Commands: create
                           print
                           exit
                           save
                           load
                           modify""");
+        }catch (ParserError e){
+            throw new PIMError(e);
+        }
+
     }
 
     private Criteria search(){
@@ -129,16 +130,16 @@ public class Parser {
                 LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr.lexeme, formatter);
                 return new TimeCriteria(operator, dateTime);
             }catch (DateTimeParseException e){
-                throw new PIMError("Invalid datetime format. (yyyy-MM-dd,HH:mm)");
+                throw new ParserError("Invalid datetime format. (yyyy-MM-dd,HH:mm)");
             }
         }
-        throw new PIMError("Expect a condition.");
+        throw new ParserError("Expect a condition.");
     }
 
     private Stmt searchStmt(){
        Criteria criteria = search();
        if (criteria == null)
-           throw new PIMError("Expect a condition after search.");
+           throw new ParserError("Expect a condition after search.");
 
         return new SearchStmt(criteria);
     }
@@ -165,7 +166,7 @@ public class Parser {
             Token dataType = previous();
             Token identifier = consume(TokenType.IDENTIFIER, "Expect an identifier for a PIR.");
             return new CreateStmt(dataType, identifier);
-        }else throw error("create {Note, Task, Schedule, Contact}");
+        }else throw new ParserError("create {Note, Task, Schedule, Contact}");
     }
 
     private Stmt printStmt(){
