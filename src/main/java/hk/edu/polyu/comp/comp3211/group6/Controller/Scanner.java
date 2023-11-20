@@ -35,13 +35,17 @@ public class Scanner {
     public List<Token> scanTokens(){
         while(!isAtEnd()){
             start = current;
-            scanToken();
+            try{
+                scanToken();
+            }catch (ScannerError e){
+                throw new PIMError(e);
+            }
         }
         tokens.add(new Token(TokenType.EOF, "", null));
         return tokens;
     }
 
-    boolean isAtEnd(){
+    private boolean isAtEnd(){
         return current >= source.length();
     }
 
@@ -99,7 +103,7 @@ public class Scanner {
         addToken(type);
     }
 
-    private void date()throws DateTimeParseException {
+    private void date(){
         while(isDate(peek())) advance();
         addToken(TokenType.DATE);
     }
@@ -108,7 +112,7 @@ public class Scanner {
         while (peek() != '"' && !isAtEnd())
             advance();
         if (isAtEnd())
-            throw new PIMError("Unterminated string.");
+            throw new ScannerError("Unterminated string.");
         advance();
         String string = source.substring(start + 1, current - 1);
         addToken(TokenType.STRING, string);
@@ -150,15 +154,11 @@ public class Scanner {
                 break;
             default:
                 if (isDate(c))
-                    try {
                         date();
-                    }catch (DateTimeParseException e){
-                        throw new PIMError("Unsupported date-time format. (yyyy-MM-dd,HH:mm)");
-                    }
                 else if (isAlpha(c))
                     identifier();
                 else{
-                    throw new PIMError("Unexpected Character");
+                    throw new ScannerError("Unexpected Character");
                 }
         }
     }
