@@ -37,7 +37,7 @@ public class Schedule extends PIR implements Serializable, HasTime {
 
     public void setTimer(){
         Alarm alarm = new Alarm("\nAlarm!\nSchedule: " + super.getIdentifier() +"\nDescription: " + description +
-                "\nStart time: " + startTime.format(formatter) + "\n(hk.edu.polyu.comp.comp3211.group6.PIM) ");
+                "\nStart time: " + startTime.format(formatter) + "\nPIM> ");
         try {
             Date date = dateFormatter.parse(alarmTime.format(formatter));
             timer.schedule(alarm, date);
