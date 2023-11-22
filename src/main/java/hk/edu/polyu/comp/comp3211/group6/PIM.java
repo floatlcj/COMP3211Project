@@ -17,6 +17,7 @@ public class PIM {
     private static boolean haveError = false;
     private static final Interpreter interpreter = new Interpreter();
     public static void main(String[] args){
+        System.out.println("\nPersonal Information Manager\nCOMP3211 Fall 2023\nGroup 6\n");
         try {
             runPrompt();
         } catch (IOException e) {
@@ -30,8 +31,10 @@ public class PIM {
         for (;;) {
             System.out.print("PIM> ");
             String line = reader.readLine();
+            System.out.print("\n");
             if (line == null) break;
             run(line);
+            System.out.print("\n");
             haveError = false;
         }
     }
